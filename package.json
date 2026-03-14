@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "validate-rules": "python  src/tests/validate_rules.py"
   },
-  "author": "",
+  "author": "OccasionalCoderByTrade",
   "license": "ISC",
   "description": "ESLint plugins for linting Markdown files",
   "keywords": [
