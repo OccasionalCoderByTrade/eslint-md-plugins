@@ -1,11 +1,12 @@
 {
   "name": "eslint-md-cannoli-plugins",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build",
+    "generate-exports": "node scripts/generate-exports.js",
+    "prepublishOnly": "npm run build && npm run generate-exports",
     "test": "echo \"Error: no test specified\" && exit 1",
     "validate-rules": "python  src/tests/validate_rules.py"
   },
@@ -24,7 +25,8 @@
   },
   "files": [
     "dist/",
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
