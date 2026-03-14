@@ -29,7 +29,7 @@ export default [
     files: ["**/*.md"],
     plugins: {
       markdown,
-      custom: {
+      cannoli: {
         rules: {
           "require-frontmatter": requireFrontmatter,
           "no-h1-headers": noH1Headers,
@@ -48,13 +48,13 @@ export default [
     },
     extends: ["markdown/recommended"],
     rules: {
-      "custom/require-frontmatter": "error",
-      "custom/no-h1-headers": "error",
-      "custom/require-blank-line-after-html": "error",
-      "custom/require-display-math-formatting": "error",
-      "custom/inline-math-alone-on-line": "warn",
-      "custom/validate-latex-delimiters": "error",
-      "custom/enforce-link-convention": "warn",
+      "cannoli/require-frontmatter": "error",
+      "cannoli/no-h1-headers": "error",
+      "cannoli/require-blank-line-after-html": "error",
+      "cannoli/require-display-math-formatting": "error",
+      "cannoli/inline-math-alone-on-line": "warn",
+      "cannoli/validate-latex-delimiters": "error",
+      "cannoli/enforce-link-convention": "warn",
     },
   },
 ];
