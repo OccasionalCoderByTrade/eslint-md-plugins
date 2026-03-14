@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 
-import { FencedCodeBlockTracker, getFrontmatterEndLine, isValidLinkFormat, slugify } from "./utils";
+import { FencedCodeBlockTracker, getFrontmatterEndLine, isValidLinkFormat, slugify } from "./utils.js";
 
 /**
  * Enforce link convention: all lowercase and no offending characters.

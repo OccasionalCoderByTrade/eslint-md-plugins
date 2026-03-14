@@ -1,8 +1,6 @@
-import js from "@eslint/js";
 import markdown from "@eslint/markdown";
 
 import { defineConfig } from "eslint/config";
-import globals from "globals";
 
 import { enforceLinkConvention } from "./src/plugins/markdown/enforce-link-convention";
 import { inlineMathAloneOnLine } from "./src/plugins/markdown/inline-math-alone-on-line";
@@ -15,12 +13,6 @@ import { validateLatexDelimiters } from "./src/plugins/markdown/validate-latex-d
 export default defineConfig([
   {
     ignores: ["dist/", ".astro/"],
-  },
-  {
-    files: ["src/**/*.{js,mjs,cjs,ts,mts,cts}"],
-    plugins: { js },
-    extends: ["js/recommended"],
-    languageOptions: { globals: globals.browser },
   },
   {
     files: [

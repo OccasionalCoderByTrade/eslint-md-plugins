@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 
-import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils";
+import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 /**
  * Check if a line contains a problematic markdown construct that requires a blank line before/after HTML.

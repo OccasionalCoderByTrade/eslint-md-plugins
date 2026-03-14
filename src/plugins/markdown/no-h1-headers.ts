@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 
-import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils";
+import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 export const noH1Headers: Rule.RuleModule = {
   meta: {

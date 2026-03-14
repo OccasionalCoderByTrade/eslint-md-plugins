@@ -1,21 +1,40 @@
 {
   "name": "eslint-md-cannoli-plugins",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "validate-rules": "python  src/tests/validate_rules.py"
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "ESLint plugins for linting Markdown files",
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "markdown",
+    "linting"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OccasionalCoderByTrade/eslint-md-plugins"
+  },
+  "files": [
+    "dist/",
+    "index.js"
+  ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^7.5.1",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
     "jiti": "^2.6.1",
-    "remark-parse": "^11.0.0"
+    "prettier": "^3.8.1",
+    "remark-parse": "^11.0.0",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@eslint/markdown": "^7.0.0",

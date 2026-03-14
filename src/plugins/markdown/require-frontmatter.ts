@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 
-import { extractFrontmatter } from "./utils";
+import { extractFrontmatter } from "./utils.js";
 
 export const requireFrontmatter: Rule.RuleModule = {
   meta: {

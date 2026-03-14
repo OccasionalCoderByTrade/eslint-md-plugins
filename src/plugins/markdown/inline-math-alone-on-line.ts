@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 
-import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils";
+import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 /**
  * Detect inline math expressions ($...$) that exist alone on their own line.
