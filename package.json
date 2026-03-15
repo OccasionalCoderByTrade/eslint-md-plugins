@@ -1,12 +1,12 @@
 {
   "name": "eslint-cannoli-plugins",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "generate-exports": "node scripts/generate-exports.js",
-    "prepublishOnly": "npm run build && npm run generate-exports",
+    "build": "tsup",
+    "prepublishOnly": "npm run build",
     "test": "python3 test_eslint_plugins.py",
     "validate-rules": "python3 src/tests/validate_rules.py"
   },
@@ -23,10 +23,14 @@
     "type": "git",
     "url": "https://github.com/OccasionalCoderByTrade/eslint-md-plugins"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
-    "dist/",
-    "index.js",
-    "index.d.ts"
+    "dist/"
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -37,6 +41,7 @@
     "jiti": "^2.6.1",
     "prettier": "^3.8.1",
     "remark-parse": "^11.0.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
