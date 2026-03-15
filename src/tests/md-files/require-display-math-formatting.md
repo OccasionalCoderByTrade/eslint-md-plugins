@@ -12,7 +12,7 @@ This is the quadratic formula with proper formatting.
 
 ## ❌ INVALID: Display math on same line
 
-$$E = mc^2$$
+$$E = mc^2$$			<!-- expect-flagged: cannoli/require-display-math-formatting -->
 
 This should be flagged - double-dollar delimiters should be on separate lines.
 

@@ -28,18 +28,18 @@ Capital M should be flagged.
 
 ## ❌ INVALID: CamelCase
 
-[Document](./MyDocument.md)
+[Document](./MyDocument.md)			<!-- expect-flagged: cannoli/enforce-link-convention -->
 
 Multiple capitals (should be flagged).
 
 ## ❌ INVALID: Spaces in path
 
-[guide](./my guide.md)
+[guide](./my guide.md)			<!-- expect-flagged: cannoli/enforce-link-convention -->
 
 Spaces are not allowed (should be flagged).
 
 ## ❌ INVALID: Special characters
 
-[file](./my-doc@2.0.md)
+[file](./my-doc@2.0.md)			<!-- expect-flagged: cannoli/enforce-link-convention -->
 
 @ symbol not allowed in local file links (should be flagged).

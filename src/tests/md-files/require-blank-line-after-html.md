@@ -13,7 +13,7 @@ Text after HTML block (with blank line before it).
 ### Plain text text and other content immediately following HTML block are ok, but markdown constructs should be separated by a blank line from HTML elements.
 
 <div>Content in div</div>
-> This text immediately follows (should be flagged).
+> This text immediately follows (should be flagged).			<!-- expect-flagged: cannoli/require-blank-line-after-html -->
 
 ## ✅ VALID: HTML comment with blank line
 

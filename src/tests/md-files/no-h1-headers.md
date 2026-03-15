@@ -3,7 +3,7 @@ title: No H1 Headers Test
 ---
 
 
-# ❌ INVALID: H1 header (should be flagged)
+# ❌ INVALID: H1 header (should be flagged)			<!-- expect-flagged: cannoli/no-h1-headers -->
 
 This is an H1 header and should trigger the rule.
 

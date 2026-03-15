@@ -20,7 +20,7 @@ I should be able to represent two literal dollar signs in a row like this: \$\$1
 
 ## INVALID: Unclosed inline math
 
-This line has an unclosed $x = 2 delimiter.
+This line has an unclosed $x = 2 delimiter.			<!-- expect-flagged: cannoli/validate-latex-delimiters -->
 
 ## VALID: Balanced display math
 

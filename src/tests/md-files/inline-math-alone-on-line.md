@@ -11,6 +11,7 @@ This is correct - the math is not alone on the line.
 ## ❌ INVALID: Inline math alone on line
 
 $x = 2$
+<!-- expect-flagged: cannoli/inline-math-alone-on-line -->
 
 This appears alone on its own line and should be flagged.
 
