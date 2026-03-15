@@ -45,8 +45,14 @@ export const validateLatexDelimiters: Rule.RuleModule = {
             continue;
           }
 
+          // Remove inline code blocks (backticks) before counting
+          const withoutInlineCode = line.replace(/`[^`]*`/g, "");
+
+          // Remove HTML comments before counting
+          const withoutComments = withoutInlineCode.replace(/<!--[\s\S]*?-->/g, "");
+
           // Remove escaped dollar signs before counting
-          const withoutEscaped = removeEscapedDelimiters(line);
+          const withoutEscaped = removeEscapedDelimiters(withoutComments);
 
           // Count $$ first (to avoid counting them as two $)
           const displayMatches = withoutEscaped.match(/\$\$/g);

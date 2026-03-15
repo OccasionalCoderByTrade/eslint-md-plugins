@@ -33,3 +33,17 @@ $$
 ```text
 $ unpaired $ delimiters in code are fine
 ```
+
+## VALID: Dollar signs in inline code blocks
+
+**Read-after-write (RAW) data hazard:**
+
+- Examples:
+  - `sub` needs `$s1` before it is updated by the load.
+
+  ```text
+  load $s1, 24($s0)
+  sub $t0, $s1, $s2
+  ```
+
+<!-- here is an html comment has $ -->
