@@ -1,25 +1,37 @@
-#!/usr/bin/env python3
-"""Test script for ESLint plugin markdown files.
+# noqa: INP001
+"""
+Test script for ESLint plugin markdown files.
 
 Parses markdown test files for expect-flagged comments and validates that
 eslint produces errors at the expected lines with no unexpected errors.
 """
 
+import json
 import re
 import subprocess
-import json
+import sys
 from pathlib import Path
+from typing import TypedDict
+
+
+class EslintError(TypedDict):
+    """Error object from eslint output."""
+
+    line: int
+    ruleId: str
+    message: str
 
 
 def parse_expected_flags(file_path: Path) -> dict[int, str]:
-    """Parse a markdown file to find lines that expect to be flagged.
+    """
+    Parse a markdown file to find lines that expect to be flagged.
 
     Returns a dict mapping line numbers (1-indexed) to rule names.
     Looks for expect-flagged comments on the same line or next line.
     """
     expected: dict[int, str] = {}
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with file_path.open("r", encoding="utf-8") as f:
         lines = f.readlines()
 
     for i, line in enumerate(lines, start=1):
@@ -38,17 +50,19 @@ def parse_expected_flags(file_path: Path) -> dict[int, str]:
     return expected
 
 
-def run_eslint(file_path: Path) -> list[dict]:
-    """Run eslint on a markdown file and return parsed results.
+def run_eslint(file_path: Path) -> list[EslintError]:
+    """
+    Run eslint on a markdown file and return parsed results.
 
     Returns a list of error objects with 'line' and 'ruleId' fields.
     """
     try:
-        result = subprocess.run(
-            ["npx", "eslint", str(file_path), "--format", "json"],
+        result = subprocess.run(  # noqa: S603
+            ["npx", "eslint", str(file_path), "--format", "json"],  # noqa: S607
             capture_output=True,
             text=True,
             cwd=Path(__file__).parent,
+            check=False,  # Don't raise on non-zero exit code since eslint returns 1 when it finds errors
         )
 
         # Parse JSON output
@@ -58,9 +72,9 @@ def run_eslint(file_path: Path) -> list[dict]:
             return []
 
         # Extract errors from first file result
-        errors: list[dict] = []
+        errors: list[EslintError] = []
         for message in output[0].get("messages", []):
-            errors.append(
+            errors.append(  # noqa: PERF401
                 {
                     "line": message["line"],
                     "ruleId": message["ruleId"],
@@ -75,7 +89,8 @@ def run_eslint(file_path: Path) -> list[dict]:
 
 
 def validate_file(file_path: Path) -> tuple[bool, str]:
-    """Validate a single markdown test file.
+    """
+    Validate a single markdown test file.
 
     Returns (success, message) tuple.
     """
@@ -107,7 +122,7 @@ def validate_file(file_path: Path) -> tuple[bool, str]:
     details: list[str] = []
 
     if missing:
-        details.append(f"Line was expected to be flagged but wasn't: {missing}")
+        details.append(f"Line wasn't flagged as expected: {missing}")
 
     if unexpected:
         details.append(f"Unexpected flags at lines: {unexpected}")
@@ -145,7 +160,7 @@ def main() -> None:
 
     # Exit with error code if any test failed
     if passed_count < total_count:
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
