@@ -2,13 +2,7 @@ import markdown from "@eslint/markdown";
 
 import { defineConfig } from "eslint/config";
 
-import { enforceLinkConvention } from "./src/plugins/markdown/enforce-link-convention";
-import { inlineMathAloneOnLine } from "./src/plugins/markdown/inline-math-alone-on-line";
-import { noH1Headers } from "./src/plugins/markdown/no-h1-headers";
-import { requireBlankLineAfterHtml } from "./src/plugins/markdown/require-blank-line-after-html";
-import { requireDisplayMathFormatting } from "./src/plugins/markdown/require-display-math-formatting";
-import { requireFrontmatter } from "./src/plugins/markdown/require-frontmatter";
-import { validateLatexDelimiters } from "./src/plugins/markdown/validate-latex-delimiters";
+import { cannoliMdPlugin } from "./src/index";
 
 export default defineConfig([
   {
@@ -22,17 +16,7 @@ export default defineConfig([
     plugins: {
       // @ts-expect-error - Type 'typeof plugin' is not assignable to type 'Plugin'.
       markdown,
-      cannoli: {
-        rules: {
-          "require-frontmatter": requireFrontmatter,
-          "no-h1-headers": noH1Headers,
-          "require-blank-line-after-html": requireBlankLineAfterHtml,
-          "require-display-math-formatting": requireDisplayMathFormatting,
-          "inline-math-alone-on-line": inlineMathAloneOnLine,
-          "validate-latex-delimiters": validateLatexDelimiters,
-          "enforce-link-convention": enforceLinkConvention,
-        },
-      },
+      cannoli: cannoliMdPlugin,
     },
     language: "markdown/gfm",
     languageOptions: {
