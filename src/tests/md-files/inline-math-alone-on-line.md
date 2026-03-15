@@ -20,4 +20,4 @@ $$
 x = \frac{1}{2}
 $$
 
-Display math with $$ is fine and different from inline math.
+Display math uses double-dollar delimiters which is different from inline math.

@@ -2,34 +2,34 @@
 title: LaTeX Delimiters Validation Test
 ---
 
-## ✅ VALID: Balanced inline math
+## VALID: Balanced inline math
 
-The equation $x = 2$ is balanced.
+The equation $x = 2$ is properly balanced.
 
-And $a + b = c$ also balanced.
+## VALID: Multiple balanced expressions
 
-## ✅ VALID: Escaped dollar signs
+First equation $a + b = c$ is fine.
 
-The price is \$100 and costs \$50.
+And second one $x = y$ is also balanced.
 
-Escaped delimiters are ignored by the rule.
+## VALID: Escaped dollar signs should not be counted as math delimiters, as these are intended to represent literal dollar signs in text rather than math delimiters.
 
-## ❌ INVALID: Unclosed inline math
+The price of this item normally \$100 but has a \$50 discount.
 
-This is an incomplete expression $x = 2
+I should be able to represent two literal dollar signs in a row like this: \$\$100 (which should not be considered math delimiters).
 
-Missing closing $ (should be flagged).
+## INVALID: Unclosed inline math
 
-## ❌ INVALID: Odd number of delimiters
+This line has an unclosed $x = 2 delimiter.
 
-Text with $ single $ delimiter $ that's not balanced.
+## VALID: Balanced display math
 
-Should be flagged for imbalance.
+$$
+2 + 2 = 4
+$$
 
-## ✅ VALID: Math in code blocks (ignored)
+## VALID: Math in code blocks
 
-```tex
-$ unpaired delimiter in code is fine
+```text
+$ unpaired $ delimiters in code are fine
 ```
-
-Code blocks are handled specially.

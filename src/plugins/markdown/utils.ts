@@ -103,6 +103,24 @@ export class FencedCodeBlockTracker {
 }
 
 /**
+ * Remove escaped LaTeX delimiters from text before counting
+ * Handles both inline ($) and display ($$) math delimiters
+ */
+export function removeEscapedDelimiters(text: string): string {
+  // Remove escaped dollar signs (\$) before counting delimiters
+  return text.replace(/\\\$/g, "");
+}
+
+/**
+ * Count occurrences of a delimiter in text (after removing escaped versions)
+ * Returns the count and tracks the line where the count becomes odd
+ */
+export interface DelimiterCount {
+  count: number;
+  firstUnclosedLine: number; // 0-indexed line number, or -1 if balanced
+}
+
+/**
  * Slugify a filename by converting to lowercase, replacing spaces/underscores/slashes with hyphens,
  * removing special characters, and normalizing diacritics to ASCII.
  * Ported from Python: scripts/organizer/util/__init__.py

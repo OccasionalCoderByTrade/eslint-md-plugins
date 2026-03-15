@@ -47,18 +47,21 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
 
           const trimmed = line.trim();
 
+          // Remove inline code (backtick-enclosed content) before checking for $$
+          const withoutInlineCode = trimmed.replace(/`[^`]*`/g, "");
+
           // Check for display math markers
-          if (!trimmed.includes("$$")) {
+          if (!withoutInlineCode.includes("$$")) {
             continue;
           }
 
-          // Count $$ occurrences in the line
-          const dollarCount = (trimmed.match(/\$\$/g) || []).length;
+          // Count $$ occurrences in the line (excluding those in inline code)
+          const dollarCount = (withoutInlineCode.match(/\$\$/g) || []).length;
 
           // If there's only one $$, it might be an opening or closing on its own line (good)
           if (dollarCount === 1) {
             // Check if the line is ONLY $$ (possibly with whitespace)
-            const isOnlyDollarSigns = /^\$\$\s*$/.test(trimmed);
+            const isOnlyDollarSigns = /^\$\$\s*$/.test(withoutInlineCode);
             if (isOnlyDollarSigns) {
               // Good: $$ is on its own line
               continue;
@@ -66,7 +69,7 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
 
             // If there's content on the same line as $$, that's bad
             // Example: "$$2+2" or "expression$$"
-            if (trimmed !== "$$") {
+            if (withoutInlineCode !== "$$") {
               context.report({
                 loc: { line: i + 1, column: 0 },
                 message:
@@ -77,7 +80,7 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
             // Two $$ on the same line
             // Check if they form a complete math block on one line: $$expression$$
             const doubleRegex = /^(\s*)\$\$(.*?)\$\$\s*$/;
-            const match = line.match(doubleRegex);
+            const match = withoutInlineCode.match(doubleRegex);
             if (match) {
               // The entire line is $$something$$, which is bad
               const indent = match[1];

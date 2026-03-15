@@ -22,7 +22,7 @@ title: Link Convention Test
 
 ## ❌ INVALID: Uppercase in path
 
-[Guide](./My-Guide.md)
+[Guide](./My-Guide.md)          <!-- expect-flagged: cannoli/enforce-link-convention -->
 
 Capital M should be flagged.
 

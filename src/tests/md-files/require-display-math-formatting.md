@@ -14,7 +14,7 @@ This is the quadratic formula with proper formatting.
 
 $$E = mc^2$$
 
-This should be flagged - \$\$ delimiters should be on their own lines.
+This should be flagged - double-dollar delimiters should be on separate lines.
 
 ## ✅ VALID: Inline math (not display)
 

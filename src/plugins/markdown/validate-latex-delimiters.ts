@@ -1,15 +1,12 @@
 import type { Rule } from "eslint";
 
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import { visit, SKIP } from "unist-util-visit";
-import type { Node as UnistNode } from "unist";
-import type { Text } from "mdast";
+import { removeEscapedDelimiters } from "./utils.js";
+import { FencedCodeBlockTracker } from "./utils.js";
 
 /**
  * Validate that LaTeX delimiters ($...$) and ($$...$$) are balanced.
  * Catches broken math rendering from mismatched or unclosed delimiters.
- * Uses remark AST parsing to correctly handle code blocks and frontmatter.
+ * Works with the original source text to properly handle escaped sequences.
  */
 export const validateLatexDelimiters: Rule.RuleModule = {
   meta: {
@@ -31,68 +28,49 @@ export const validateLatexDelimiters: Rule.RuleModule = {
         if (!sourceCode) return;
 
         const text = sourceCode.getText();
-
-        // Parse markdown into AST
-        const processor = unified().use(remarkParse);
-        const ast = processor.parse(text);
+        const lines = text.split("\n");
+        const codeBlockTracker = new FencedCodeBlockTracker(text);
 
         // Track unclosed delimiters
-        let inlineDelimiterCount = 0; // $ count
-        let displayDelimiterCount = 0; // $$ count
+        let inlineDelimiterCount = 0;
+        let displayDelimiterCount = 0;
         let inlineStartLine = -1;
         let displayStartLine = -1;
 
-        // Visit all text nodes, automatically skipping code blocks
-        visit(
-          ast,
-          (nodeToVisit: UnistNode) => {
-            // Skip code blocks and inline code
-            if (
-              nodeToVisit.type === "code" ||
-              nodeToVisit.type === "inlineCode" ||
-              nodeToVisit.type === "codeBlock"
-            ) {
-              return SKIP;
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+
+          // Skip lines inside fenced code blocks
+          if (codeBlockTracker.isLineInFencedCodeBlock(i)) {
+            continue;
+          }
+
+          // Remove escaped dollar signs before counting
+          const withoutEscaped = removeEscapedDelimiters(line);
+
+          // Count $$ first (to avoid counting them as two $)
+          const displayMatches = withoutEscaped.match(/\$\$/g);
+          if (displayMatches) {
+            displayDelimiterCount += displayMatches.length;
+            if (displayDelimiterCount % 2 === 1 && displayStartLine === -1) {
+              displayStartLine = i;
+            } else if (displayDelimiterCount % 2 === 0) {
+              displayStartLine = -1;
             }
+          }
 
-            // Process text nodes only
-            if (nodeToVisit.type === "text") {
-              const textNode = nodeToVisit as Text;
-              const textContent = textNode.value;
-
-              // Remove escaped dollar signs (\$)
-              const unescaped = textContent.replace(/\\\$/g, "");
-
-              // Count $$ first (to avoid counting them as two $)
-              const displayMatches = unescaped.match(/\$\$/g);
-              if (displayMatches) {
-                displayDelimiterCount += displayMatches.length;
-                if (displayDelimiterCount % 2 === 1 && displayStartLine === -1) {
-                  // Find the line number from position
-                  const precedingText = text.slice(0, textNode.position?.start.offset ?? 0);
-                  displayStartLine = precedingText.split("\n").length - 1;
-                } else if (displayDelimiterCount % 2 === 0) {
-                  displayStartLine = -1;
-                }
-              }
-
-              // Count remaining $ (after removing $$)
-              const withoutDisplay = unescaped.replace(/\$\$/g, "");
-              const inlineMatches = withoutDisplay.match(/\$/g);
-              if (inlineMatches) {
-                inlineDelimiterCount += inlineMatches.length;
-                if (inlineDelimiterCount % 2 === 1 && inlineStartLine === -1) {
-                  // Find the line number from position
-                  const precedingText = text.slice(0, textNode.position?.start.offset ?? 0);
-                  inlineStartLine = precedingText.split("\n").length - 1;
-                } else if (inlineDelimiterCount % 2 === 0) {
-                  inlineStartLine = -1;
-                }
-              }
+          // Count remaining $ (after removing $$)
+          const withoutDisplay = withoutEscaped.replace(/\$\$/g, "");
+          const inlineMatches = withoutDisplay.match(/\$/g);
+          if (inlineMatches) {
+            inlineDelimiterCount += inlineMatches.length;
+            if (inlineDelimiterCount % 2 === 1 && inlineStartLine === -1) {
+              inlineStartLine = i;
+            } else if (inlineDelimiterCount % 2 === 0) {
+              inlineStartLine = -1;
             }
-          },
-          true
-        );
+          }
+        }
 
         // Report unclosed display math
         if (displayDelimiterCount % 2 !== 0) {
