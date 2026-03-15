@@ -20,3 +20,11 @@ Text after HTML block (with blank line before it).
 <!-- This is a comment -->
 
 Text after comment with blank line.
+
+## Valid: Fenced code block with HTML content should not trigger the rule
+
+```html
+<div>
+  <p>Some content here</p>
+</div>
+```
