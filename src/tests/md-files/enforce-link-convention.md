@@ -14,15 +14,23 @@ title: Link Convention Test
 
 [kebab-case](./kebab-case-file.md)
 
-## ✅ VALID: External links
+## ✅ VALID: External links are not checked
 
 [Google](https://google.com)
 
 [GitHub](https://github.com)
 
-## VALID: Link matches suggested slug (Suggested slug has a greater subset of allowed characters/substrings)
+## ✅ VALID: Link's href has violating characters, but it is allowed to pass because it matches suggested slug
 
 [2025-11-17](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck) - Asn 5--Solutions+QUICKCHECK [(original)](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck.txt)
+
+## ✅ VALID: Page link with no violating characters
+
+[Page Link](./some-dir/page-link)
+
+## ❌ INVALID: Page link with violating characters
+
+[Page Link](./someDir/SomeLink)          <!-- expect-flagged: cannoli/enforce-link-convention -->
 
 ## ❌ INVALID: Uppercase in path
 
@@ -47,3 +55,5 @@ Spaces are not allowed (should be flagged).
 [file](./my-doc@2.0.md)			<!-- expect-flagged: cannoli/enforce-link-convention -->
 
 @ symbol not allowed in local file links (should be flagged).
+
+

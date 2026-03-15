@@ -105,21 +105,16 @@ export const enforceLinkConvention: Rule.RuleModule = {
           columnIndex: number,
           ctx: Rule.RuleContext
         ): void {
-          // Skip external links (any URL protocol) and anchors
-          const externalProtocols = [
-            "http://",
-            "https://",
-            "mailto:",
-            "ftp://",
-            "ftps://",
-            "sftp://",
-            "ssh://",
-            "tel:",
-            "sms:",
-            "data:",
-          ];
-          if (externalProtocols.some((proto) => link.startsWith(proto)) || link.startsWith("#")) {
-            return;
+          // Skip external links (any valid URL) and anchors
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            new ((globalThis as any).URL)(link);
+            return; // Valid external URL, skip it
+          } catch {
+            // Not a valid URL - could be a relative path or anchor
+            if (link.startsWith("#")) {
+              return; // It's an anchor, skip it
+            }
           }
 
           // Check if link is valid format
