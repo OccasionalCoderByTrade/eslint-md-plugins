@@ -24,6 +24,31 @@ title: Link Convention Test
 
 [2025-11-17](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck) - Asn 5--Solutions+QUICKCHECK [(original)](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck.txt)
 
+## ✅ VALID: Link with underscores
+
+[my_document](./my_document.md)
+
+## ✅ VALID: Link with hyphens
+
+[kebab-case](./kebab-case-file.md)
+
+## ✅ VALID: Link with numbers
+
+[version 2.0](./version-2.0.md)
+
+## ✅ VALID: Link with mixed lowercase and numbers
+
+[release v1.2](./release-v1.2.md)
+
+## ✅ VALID: Link with multiple hyphens and underscores
+
+[complex-link_name-123](./complex-link_name-123.md)
+
+## ✅ VALID: Violating rule with eslint-disable-next-line comment
+
+<!-- eslint-disable-next-line cannoli/enforce-link-convention -->
+[README](./README.md)
+
 ## ✅ VALID: Page link with no violating characters
 
 [Page Link](./some-dir/page-link)
