@@ -1,6 +1,6 @@
 {
-  "name": "eslint-md-cannoli-plugins",
-  "version": "1.0.2",
+  "name": "eslint-cannoli-plugins",
+  "version": "1.0.0",
   "type": "module",
   "main": "index.js",
   "scripts": {
