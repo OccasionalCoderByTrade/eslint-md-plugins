@@ -20,6 +20,10 @@ title: Link Convention Test
 
 [GitHub](https://github.com)
 
+## VALID: Link matches suggested slug (Suggested slug has a greater subset of allowed characters/substrings)
+
+[2025-11-17](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck) - Asn 5--Solutions+QUICKCHECK [(original)](all-announcements/csci-316-2025-11-17-asn-5-solutions+quickcheck.txt)
+
 ## ❌ INVALID: Uppercase in path
 
 [Guide](./My-Guide.md)          <!-- expect-flagged: cannoli/enforce-link-convention -->

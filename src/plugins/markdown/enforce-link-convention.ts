@@ -127,13 +127,17 @@ export const enforceLinkConvention: Rule.RuleModule = {
             // Separate basename and extension to preserve the extension
             const { basename, extension } = extractExtension(link);
             const suggestion = slugifyPath(basename) + extension;
-            ctx.report({
-              loc: {
-                start: { line: lineIndex + 1, column: columnIndex },
-                end: { line: lineIndex + 1, column: columnIndex + link.length },
-              },
-              message: `Link contains invalid characters or uppercase letters. Links should be lowercase and contain only alphanumeric characters, hyphens, underscores, slashes, and dots. Suggested format: "${suggestion}"`,
-            });
+
+            // Only flag if the link doesn't match the suggested slug
+            if (link !== suggestion) {
+              ctx.report({
+                loc: {
+                  start: { line: lineIndex + 1, column: columnIndex },
+                  end: { line: lineIndex + 1, column: columnIndex + link.length },
+                },
+                message: `Link contains invalid characters or uppercase letters. Links should be lowercase and contain only alphanumeric characters, hyphens, underscores, slashes, and dots. Suggested format: "${suggestion}"`,
+              });
+            }
           }
         }
       },
