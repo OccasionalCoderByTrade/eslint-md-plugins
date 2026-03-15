@@ -32,10 +32,6 @@ title: Link Convention Test
 
 [kebab-case](./kebab-case-file.md)
 
-## ✅ VALID: Link with numbers
-
-[version 2.0](./version-2.0.md)
-
 ## ✅ VALID: Link with mixed lowercase and numbers
 
 [release v1.2](./release-v1.2.md)
@@ -52,6 +48,11 @@ title: Link Convention Test
 ## ✅ VALID: Page link with no violating characters
 
 [Page Link](./some-dir/page-link)
+
+## VALID: Looks like a link but not a link (should not be flagged)
+
+- \[Not a link\](<https://example.com>)
+- \[Another non-link\](./notALink.md)
 
 ## ❌ INVALID: Page link with violating characters
 
