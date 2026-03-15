@@ -60,11 +60,13 @@ def run_eslint(file_path: Path) -> list[dict]:
         # Extract errors from first file result
         errors: list[dict] = []
         for message in output[0].get("messages", []):
-            errors.append({
-                "line": message["line"],
-                "ruleId": message["ruleId"],
-                "message": message["message"],
-            })
+            errors.append(
+                {
+                    "line": message["line"],
+                    "ruleId": message["ruleId"],
+                    "message": message["message"],
+                }
+            )
 
         return errors
     except (subprocess.CalledProcessError, json.JSONDecodeError) as e:
@@ -105,7 +107,7 @@ def validate_file(file_path: Path) -> tuple[bool, str]:
     details: list[str] = []
 
     if missing:
-        details.append(f"Missing expected flags at lines: {missing}")
+        details.append(f"Line was expected to be flagged but wasn't: {missing}")
 
     if unexpected:
         details.append(f"Unexpected flags at lines: {unexpected}")

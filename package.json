@@ -7,8 +7,8 @@
     "build": "tsc",
     "generate-exports": "node scripts/generate-exports.js",
     "prepublishOnly": "npm run build && npm run generate-exports",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "validate-rules": "python  src/tests/validate_rules.py"
+    "test": "python3 test_eslint_plugins.py",
+    "validate-rules": "python3 src/tests/validate_rules.py"
   },
   "author": "OccasionalCoderByTrade",
   "license": "ISC",
