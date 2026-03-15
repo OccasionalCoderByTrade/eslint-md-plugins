@@ -6,7 +6,7 @@ import { requireDisplayMathFormatting } from "./plugins/markdown/require-display
 import { requireFrontmatter } from "./plugins/markdown/require-frontmatter.js";
 import { validateLatexDelimiters } from "./plugins/markdown/validate-latex-delimiters.js";
 
-export const cannoliMdPlugin = {
+export default {
   rules: {
     "require-frontmatter": requireFrontmatter,
     "no-h1-headers": noH1Headers,

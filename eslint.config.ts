@@ -2,7 +2,7 @@ import markdown from "@eslint/markdown";
 
 import { defineConfig } from "eslint/config";
 
-import { cannoliMdPlugin } from "./src/index";
+import cannoli from "./src/index";
 
 export default defineConfig([
   {
@@ -16,7 +16,7 @@ export default defineConfig([
     plugins: {
       // @ts-expect-error - Type 'typeof plugin' is not assignable to type 'Plugin'.
       markdown,
-      cannoli: cannoliMdPlugin,
+      cannoli,
     },
     language: "markdown/gfm",
     languageOptions: {
