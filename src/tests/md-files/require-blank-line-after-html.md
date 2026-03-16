@@ -28,3 +28,11 @@ Text after comment with blank line.
   <p>Some content here</p>
 </div>
 ```
+
+## Invalid. Embed image link without blank line after HTML block
+
+<details>
+  <summary>Click to expand</summary>
+  ![alt text](./image.png)      <!-- expect-flagged: cannoli/require-blank-line-after-html -->
+  
+</details>
