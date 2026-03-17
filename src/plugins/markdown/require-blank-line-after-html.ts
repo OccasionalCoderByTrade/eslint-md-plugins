@@ -9,8 +9,8 @@ import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 function isProblematicMarkdownConstruct(line: string): boolean {
   const trimmed = line.trim();
 
-  // Blockquote
-  if (/^>/.test(trimmed)) return true;
+  // Blockquote (> followed by space)
+  if (/^>\s/.test(trimmed)) return true;
 
   // List (-, *, +)
   if (/^[-*+]\s/.test(trimmed)) return true;
@@ -26,6 +26,9 @@ function isProblematicMarkdownConstruct(line: string): boolean {
 
   // Bold/Strong (**, __)
   if (/^\*\*/.test(trimmed) || /^__/.test(trimmed)) return true;
+
+  // Strikethrough (~~)
+  if (/^~~/.test(trimmed)) return true;
 
   // Emphasis (*, _) - but not list markers (those are checked above with space)
   if (/^\*[^\s*]/.test(trimmed) || /^_[^\s_]/.test(trimmed)) return true;

@@ -41,7 +41,7 @@ export const enforceLinkConvention: Rule.RuleModule = {
           // Match markdown links: [text](link) and [text]: link
           // Use negative lookbehind to avoid matching escaped brackets like \[text\]
           const inlineLinksRegex = /(?<!\\)\[([^\]]+)\]\(([^)]+)\)/g;
-          const referenceLinkRegex = /^\s*\[([^\]]+)\]:\s*(.+?)(?:\s+"[^"]*")?$/;
+          const referenceLinkRegex = /^\s*\[([^\]]+)\]:\s*([^<\n]+?)(?:\s+"[^"]*")?(?:\s*<!--.*)?$/;
 
           // Check inline links [text](link)
           let inlineMatch;

@@ -54,6 +54,15 @@ title: Link Convention Test
 - \[Not a link\](<https://example.com>)
 - \[Another non-link\](./notALink.md)
 
+## VALID: External link
+
+[link-ref]: https://example.com             <!-- totally non intrusive HTML comment -->
+
+[link-ref2]: ./hello/there.md
+
+Here is a reference to an external link: [Example][link-ref].
+Here is a reference to a local file: [Hello][link-ref2].
+
 ## ❌ INVALID: Page link with violating characters
 
 [Page Link](./someDir/SomeLink)          <!-- expect-flagged: cannoli/enforce-link-convention -->
