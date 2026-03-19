@@ -31,6 +31,7 @@ export default defineConfig([
       "cannoli/require-display-math-formatting": "error",
       "cannoli/inline-math-alone-on-line": "warn",
       "cannoli/validate-latex-delimiters": "error",
+      "cannoli/no-escape-latex-delimiters": "warn",
       "cannoli/enforce-link-convention": "warn",
       "markdown/no-missing-label-refs": "off",
       "markdown/require-alt-text": "off",
