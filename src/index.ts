@@ -1,5 +1,6 @@
 import { enforceLinkConvention } from "./plugins/markdown/enforce-link-convention.js";
 import { inlineMathAloneOnLine } from "./plugins/markdown/inline-math-alone-on-line.js";
+import { limitDisplayMathLength } from "./plugins/markdown/limit-display-math-length.js";
 import { noEscapeLatexDelimiters } from "./plugins/markdown/no-escape-latex-delimiters.js";
 import { noH1Headers } from "./plugins/markdown/no-h1-headers.js";
 import { requireBlankLineAfterHtml } from "./plugins/markdown/require-blank-line-after-html.js";
@@ -17,5 +18,6 @@ export default {
     "validate-latex-delimiters": validateLatexDelimiters,
     "no-escape-latex-delimiters": noEscapeLatexDelimiters,
     "enforce-link-convention": enforceLinkConvention,
+    "limit-display-math-length": limitDisplayMathLength,
   },
 };

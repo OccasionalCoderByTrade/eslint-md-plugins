@@ -33,6 +33,7 @@ export default defineConfig([
       "cannoli/validate-latex-delimiters": "error",
       "cannoli/no-escape-latex-delimiters": "warn",
       "cannoli/enforce-link-convention": "warn",
+      "cannoli/limit-display-math-length": "warn",
       "markdown/no-missing-label-refs": "off",
       "markdown/require-alt-text": "off",
       // "markdown/no-duplicate-headings": "error",

@@ -36,16 +36,22 @@ def parse_expected_flags(file_path: Path) -> dict[int, str]:
 
     for i, line in enumerate(lines, start=1):
         # Look for expect-flagged comments on current line
-        match = re.search(r"<!-- expect-flagged: ([\w/-]+) -->", line)
+        # Supports optional offset: expect-flagged[2] for 2 lines after, expect-flagged[-2] for 2 lines before
+        match = re.search(r"<!-- expect-flagged(?:\[(-?\d+)\])?: ([\w/-]+) -->", line)
         if match:
-            rule_name = match.group(1)
-            # Comment on same line means previous line should be flagged
+            offset_str = match.group(1)
+            rule_name = match.group(2)
+
+            # Determine the target line number
             if line.strip().startswith("<!--"):
-                # This is a standalone comment line, so it refers to the previous line
-                expected[i - 1] = rule_name
+                # This is a standalone comment line
+                offset = int(offset_str) if offset_str else -1  # Default: previous line
             else:
                 # Comment is on same line as content
-                expected[i] = rule_name
+                offset = int(offset_str) if offset_str else 0  # Default: same line
+
+            target_line = i + offset
+            expected[target_line] = rule_name
 
     return expected
 
