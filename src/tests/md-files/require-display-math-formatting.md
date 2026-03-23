@@ -21,3 +21,11 @@ This should be flagged - double-dollar delimiters should be on separate lines.
 The equation $x = 2$ appears inline in text.
 
 This is different from display math.
+
+## ✅ VALID: Display math delimiters inline with other content
+
+You can write display math like $$E = mc^2$$ within a sentence of text.
+
+Or use it at the end: Some description $$a^2 + b^2 = c^2$$.
+
+And at the beginning: $$x = \frac{1}{2}$$ is half.

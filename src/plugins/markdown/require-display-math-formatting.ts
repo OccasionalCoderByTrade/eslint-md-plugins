@@ -4,12 +4,14 @@ import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 /**
  * Check if a line contains display math ($$) that's not properly formatted.
- * Display math should have $$ on its own line, not inline with the expression.
+ * Display math is allowed inline with other content.
+ * Only enforce the separate line pattern ($$\n...\n$$) when the math block is alone on its line.
  *
- * Bad:  $$2+2$$
+ * Bad:  $$2+2$$          (alone on line)
  * Good: $$
  *       2+2
  *       $$
+ * Also Good: Some text $$2+2$$ more text (inline is allowed)
  */
 export const requireDisplayMathFormatting: Rule.RuleModule = {
   meta: {
@@ -17,7 +19,7 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
     fixable: "code",
     docs: {
       description:
-        "Require display math ($$) to be on separate lines from the expression",
+        "Require display math ($$) blocks alone on a line to use the multi-line format ($$\\n...\\n$$)",
     },
   } as const,
   create(context: Rule.RuleContext): Rule.RuleListener {
@@ -47,42 +49,29 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
 
           const trimmed = line.trim();
 
-          // Remove inline code (backtick-enclosed content) before checking for $$
-          const withoutInlineCode = trimmed.replace(/`[^`]*`/g, "");
+          // Remove inline code (backtick-enclosed content) and HTML comments before checking for $$
+          let withoutInlineCode = trimmed.replace(/`[^`]*`/g, "");
+          withoutInlineCode = withoutInlineCode.replace(/<!--.*?-->/g, "").trim();
 
           // Check for display math markers
           if (!withoutInlineCode.includes("$$")) {
             continue;
           }
 
-          // Count $$ occurrences in the line (excluding those in inline code)
+          // Count $$ occurrences in the line (excluding those in inline code and comments)
           const dollarCount = (withoutInlineCode.match(/\$\$/g) || []).length;
 
-          // If there's only one $$, it might be an opening or closing on its own line (good)
+          // If there's only one $$, it's an opening or closing delimiter (allowed)
           if (dollarCount === 1) {
-            // Check if the line is ONLY $$ (possibly with whitespace)
-            const isOnlyDollarSigns = /^\$\$\s*$/.test(withoutInlineCode);
-            if (isOnlyDollarSigns) {
-              // Good: $$ is on its own line
-              continue;
-            }
-
-            // If there's content on the same line as $$, that's bad
-            // Example: "$$2+2" or "expression$$"
-            if (withoutInlineCode !== "$$") {
-              context.report({
-                loc: { line: i + 1, column: 0 },
-                message:
-                  "Display math ($$) should be on its own line, separate from the expression",
-              });
-            }
+            // Single $$ on a line is allowed - it's part of multi-line $$...$$
+            continue;
           } else if (dollarCount === 2) {
             // Two $$ on the same line
-            // Check if they form a complete math block on one line: $$expression$$
+            // Only enforce separate lines if the ENTIRE line is just the math block
             const doubleRegex = /^(\s*)\$\$(.*?)\$\$\s*$/;
             const match = withoutInlineCode.match(doubleRegex);
             if (match) {
-              // The entire line is $$something$$, which is bad
+              // The entire line is $$something$$, which requires separate lines
               const indent = match[1];
               const expression = match[2];
               context.report({
@@ -101,14 +90,8 @@ export const requireDisplayMathFormatting: Rule.RuleModule = {
                   return fixer.replaceTextRange([lineStart, lineEnd], replacement);
                 },
               });
-            } else {
-              // Two $$ but not in the expected format - could be overlapping or weird
-              context.report({
-                loc: { line: i + 1, column: 0 },
-                message:
-                  "Malformed display math notation. Display math ($$) should be on separate lines",
-              });
             }
+            // If match is null, the $$ is inline with other content, which is allowed - skip
           } else if (dollarCount > 2) {
             // Multiple $$ pairs on the same line - likely multiple math expressions or malformed
             context.report({
