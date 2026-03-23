@@ -16,10 +16,26 @@ export const limitDisplayMathLength: Rule.RuleModule = {
   meta: {
     type: "suggestion",
     docs: {
-      description: "Limit display math ($$) block lengths to 60 characters for better mobile view",
+      description:
+        "Limit display math ($$) block lengths for better mobile view",
     },
+    schema: [
+      {
+        type: "object",
+        properties: {
+          charLimit: {
+            type: "number",
+            default: 60,
+            description: "Maximum number of characters per line in display math blocks",
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
   } as const,
   create(context: Rule.RuleContext): Rule.RuleListener {
+    const options = (context.options[0] as { charLimit?: number }) || {};
+    const charLimit = options.charLimit ?? 60;
     let alreadyProcessed = false;
 
     return {
@@ -63,7 +79,7 @@ export const limitDisplayMathLength: Rule.RuleModule = {
           const singleLineMatch = trimmed.match(/^(\s*)\$\$(.*?)\$\$\s*$/);
           if (singleLineMatch) {
             const content = singleLineMatch[2];
-            if (content.length > 60) {
+            if (content.length > charLimit) {
               processedLines.add(i);
               const lineContent = line.trimEnd();
               const lineStart = sourceCode.getIndexFromLoc({
@@ -77,7 +93,7 @@ export const limitDisplayMathLength: Rule.RuleModule = {
               context.report({
                 loc: { line: i + 1, column: 1 },
                 range: [lineStart, lineEnd],
-                message: `Display math block is ${content.length} characters. Consider splitting into multiple lines using \\\\ as line delimiter and & for alignment to keep it under 60 characters for better mobile view.`,
+                message: `Display math block is ${content.length} characters, exceeds ${charLimit} character limit. Consider splitting into multiple lines using \\\\ as line delimiter and & for alignment.`,
               } as any);
             }
             continue;
@@ -120,7 +136,7 @@ export const limitDisplayMathLength: Rule.RuleModule = {
                   continue;
                 }
 
-                if (contentLength > 60) {
+                if (contentLength > charLimit) {
                   const contentLineText = lines[lineIndex];
                   const contentLineTrimmed = contentLineText.trimEnd();
                   const contentLineStart = sourceCode.getIndexFromLoc({
@@ -134,7 +150,7 @@ export const limitDisplayMathLength: Rule.RuleModule = {
                   context.report({
                     loc: { line: lineIndex + 1, column: 1 },
                     range: [contentLineStart, contentLineEnd],
-                    message: `Display math line is ${contentLength} characters, exceeds 60 character limit which is ideal for mobile viewing. Consider splitting using \\\\ as line delimiter with potentially & for alignment.`,
+                    message: `Display math line is ${contentLength} characters, exceeds ${charLimit} character limit. Consider splitting using \\\\ as line delimiter and & for alignment.`,
                   } as any);
                   processedLines.add(lineIndex);
                 }
