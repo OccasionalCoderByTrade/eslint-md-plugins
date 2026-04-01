@@ -3,23 +3,27 @@ import type { Rule } from "eslint";
 import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 /**
- * Check if a line contains a problematic markdown construct that requires a blank line before/after HTML.
- * Block-level constructs like headings are excluded since they don't interfere with HTML rendering.
+ * Check if a line contains a markdown construct that requires blank line after HTML
  */
 function isProblematicMarkdownConstruct(line: string): boolean {
   const trimmed = line.trim();
 
+  if (!trimmed) return false;
+
+  // Headings (# through ###### followed by space)
+  if (/^#{1,6}\s/.test(trimmed)) return true;
+
   // Blockquote (> followed by space)
   if (/^>\s/.test(trimmed)) return true;
 
-  // List (-, *, +)
+  // List (-, *, +) followed by space
   if (/^[-*+]\s/.test(trimmed)) return true;
 
   // Image
   if (/^!\[/.test(trimmed)) return true;
 
-  // Link (starts with [)
-  if (/^\[/.test(trimmed)) return true;
+  // Link (starts with [ and has matching ])
+  if (/^\[/.test(trimmed) && /\]/.test(trimmed)) return true;
 
   // Inline code (starts with backtick)
   if (/^`/.test(trimmed)) return true;
@@ -30,21 +34,31 @@ function isProblematicMarkdownConstruct(line: string): boolean {
   // Strikethrough (~~)
   if (/^~~/.test(trimmed)) return true;
 
-  // Emphasis (*, _) - but not list markers (those are checked above with space)
+  // Emphasis (*, _) - but not list markers
   if (/^\*[^\s*]/.test(trimmed) || /^_[^\s_]/.test(trimmed)) return true;
 
-  // Do NOT include headings - they're block-level structural elements
-  // Do NOT include normal text - it's not problematic
-  // Do NOT flag HTML tags here - they're handled separately
+  // Table (starts with |)
+  if (/^\|/.test(trimmed)) return true;
 
   return false;
+}
+
+/**
+ * Check if a line is an HTML element/tag (but not comments or blank lines)
+ */
+function isHtmlLine(line: string): boolean {
+  const trimmed = line.trim();
+  // HTML tags start with < but exclude comments
+  if (!trimmed.startsWith("<")) return false;
+  if (trimmed.startsWith("<!--")) return false; // Exclude comments
+  return true;
 }
 
 export const requireBlankLineAfterHtml: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
-      description: "Require blank line after closing HTML tags unless followed by another HTML tag",
+      description: "Require blank line after HTML blocks when followed by markdown constructs",
     },
   } as const,
   create(context: Rule.RuleContext): Rule.RuleListener {
@@ -64,131 +78,42 @@ export const requireBlankLineAfterHtml: Rule.RuleModule = {
         const frontmatterEndLine = getFrontmatterEndLine(text);
         const codeBlockTracker = new FencedCodeBlockTracker(text);
 
-        for (let i = frontmatterEndLine; i < lines.length; i++) {
-          const line = lines[i];
+        // Track the last HTML line seen
+        let lastHtmlLine = -1;
 
-          // Skip lines inside fenced code blocks
+        for (let i = frontmatterEndLine; i < lines.length; i++) {
           if (codeBlockTracker.isLineInFencedCodeBlock(i)) {
             continue;
           }
 
-          // Check if current line is a problematic markdown construct
-          if (isProblematicMarkdownConstruct(line)) {
-            // Look back to find previous non-empty line
-            let prevNonEmptyLine = null;
-            let prevNonEmptyLineNum = -1;
+          const line = lines[i];
+          const trimmed = line.trim();
 
-            for (let j = i - 1; j >= frontmatterEndLine; j--) {
-              if (lines[j].trim()) {
-                prevNonEmptyLine = lines[j];
-                prevNonEmptyLineNum = j;
-                break;
-              }
-            }
-
-            // If previous line is directly before (no blank line)
-            if (prevNonEmptyLine && prevNonEmptyLineNum === i - 1) {
-              // Check if previous line is an HTML closing tag
-              const prevIsHtmlClosingTag = /<\/\w+>\s*$/.test(prevNonEmptyLine.trim());
-
-              if (prevIsHtmlClosingTag) {
-                context.report({
-                  loc: { line: i + 1, column: 0 },
-                  message: `Blank line required before markdown construct when preceded by closing HTML tag`,
-                });
-              }
-            }
+          // Update last HTML line if this is HTML
+          if (isHtmlLine(line)) {
+            lastHtmlLine = i;
+            continue;
           }
 
-          // Check for HTML tags (opening or closing)
-          const htmlTagMatch = line.match(/^(.*)(<\/?(\w+)>)(.*)$/);
+          // If this is an empty line, reset tracking (blank line is good separator)
+          if (!trimmed) {
+            lastHtmlLine = -1;
+            continue;
+          }
 
-          if (htmlTagMatch) {
-            const beforeTag = htmlTagMatch[1];
-            const htmlTag = htmlTagMatch[2];
-            const afterTag = htmlTagMatch[4];
-
-            // If there's content before the tag on the same line, it's inline - check after
-            if (beforeTag.trim()) {
-              continue;
-            }
-
-            // If there's content after the tag on the same line, no check needed
-            if (afterTag.trim()) {
-              continue;
-            }
-
-            // Look backward to find the previous non-empty line
-            let prevNonEmptyLine = null;
-            let prevNonEmptyLineNum = -1;
-
-            for (let j = i - 1; j >= frontmatterEndLine; j--) {
-              if (lines[j].trim()) {
-                prevNonEmptyLine = lines[j];
-                prevNonEmptyLineNum = j;
-                break;
-              }
-            }
-
-            // Check if previous line is a problematic markdown construct (not headings)
-            if (prevNonEmptyLine && prevNonEmptyLineNum === i - 1) {
-              // Previous line is directly before (no blank line)
-              const prevIsProblematicConstruct = isProblematicMarkdownConstruct(prevNonEmptyLine);
-
-              if (prevIsProblematicConstruct) {
-                context.report({
-                  loc: { line: i + 1, column: 0 },
-                  message: `Blank line required before HTML tag "${htmlTag}" when preceded by markdown construct`,
-                });
-                // Continue to next iteration to avoid reporting multiple errors
-                continue;
-              }
-            }
-
-            // Look ahead to find the next non-empty line (for closing tags)
-            let nextNonEmptyLine = null;
-            let nextNonEmptyLineNum = -1;
-
-            for (let j = i + 1; j < lines.length; j++) {
-              if (lines[j].trim()) {
-                nextNonEmptyLine = lines[j];
-                nextNonEmptyLineNum = j;
-                break;
-              }
-            }
-
-            // If no next line found, no error
-            if (!nextNonEmptyLine) {
-              continue;
-            }
-
-            // Only check blank line after for closing tags
-            if (/<\//.test(htmlTag)) {
-              // Check if the next line is another HTML tag
-              const isNextLineHtmlTag = /^<[a-zA-Z/]/.test(nextNonEmptyLine.trim());
-
-              // If next line is an HTML tag, blank line is optional (exception)
-              if (isNextLineHtmlTag) {
-                continue;
-              }
-
-              // If there are blank lines between closing tag and next content, no error
-              if (nextNonEmptyLineNum > i + 1) {
-                continue;
-              }
-
-              // Check if the next line is a problematic markdown construct that requires blank line
-              const nextIsProblematicConstruct = isProblematicMarkdownConstruct(nextNonEmptyLine);
-
-              // If next line is a problematic markdown construct, require blank line (report error)
-              if (nextIsProblematicConstruct) {
-                context.report({
-                  loc: { line: i + 1, column: 0 },
-                  message: `Blank line required after closing HTML tag "${htmlTag}" when followed by markdown construct`,
-                });
-              }
+          // We have a non-empty, non-HTML line
+          // Check if it follows HTML without blank line
+          if (lastHtmlLine >= 0 && i === lastHtmlLine + 1) {
+            // Direct next line after HTML block
+            if (isProblematicMarkdownConstruct(line)) {
+              context.report({
+                loc: { line: i + 1, column: 0 },
+                message: "Blank line required after HTML block when followed by markdown construct",
+              });
             }
           }
+          // Reset tracking - we've seen non-HTML, non-blank content
+          lastHtmlLine = -1;
         }
       },
     };

@@ -209,3 +209,10 @@ Some text here.
 <section>Section two</section>
 
 - A list with spacing
+
+## Invalid
+
+<div class="note-to-self" data-is-note="true">
+## Homework (Spring 2026)						<!-- expect-flagged: cannoli/require-blank-line-after-html -->
+
+</div>
