@@ -86,10 +86,11 @@ export const enforceFrontmatterSchema: Rule.RuleModule = {
         let parsed: unknown;
         try {
           parsed = jsYaml.load(frontmatterText);
-        } catch {
+        } catch (e) {
+          const mark = (e as { mark?: { line?: number; column?: number } }).mark;
           context.report({
-            loc: { line: 1, column: 0 },
-            message: `Frontmatter is invalid YAML. Required fields: ${requiredFields}`,
+            loc: { line: mark?.line ?? 1, column: mark?.column ?? 0 },
+            message: `Syntax error in frontmatter YAML declaration`,
           });
           return;
         }
