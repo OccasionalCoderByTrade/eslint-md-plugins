@@ -87,9 +87,8 @@ export const enforceFrontmatterSchema: Rule.RuleModule = {
         try {
           parsed = jsYaml.load(frontmatterText);
         } catch (e) {
-          const mark = (e as { mark?: { line?: number; column?: number } }).mark;
           context.report({
-            loc: { line: mark?.line ?? 1, column: mark?.column ?? 0 },
+            loc: { line: 1, column: 0 },
             message: `Syntax error in frontmatter YAML declaration`,
           });
           return;
