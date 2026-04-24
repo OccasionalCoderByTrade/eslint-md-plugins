@@ -25,7 +25,6 @@ export default defineConfig([
     },
     extends: ["markdown/recommended"],
     rules: {
-      "cannoli/require-frontmatter": "error",
       "cannoli/no-h1-headers": "error",
       "cannoli/require-blank-line-after-html": "error",
       "cannoli/require-display-math-formatting": "error",
@@ -34,6 +33,12 @@ export default defineConfig([
       "cannoli/no-escape-latex-delimiters": "warn",
       "cannoli/enforce-link-convention": "warn",
       "cannoli/limit-display-math-length": ["warn", { charLimit: 60 }],
+      "cannoli/enforce-frontmatter-schema": [
+        "error",
+        {
+          title: "*",
+        },
+      ],
       "markdown/no-missing-label-refs": "off",
       "markdown/require-alt-text": "off",
       // "markdown/no-duplicate-headings": "error",

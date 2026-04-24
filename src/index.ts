@@ -1,3 +1,4 @@
+import { enforceFrontmatterSchema } from "./plugins/markdown/enforce-frontmatter-schema.js";
 import { enforceLinkConvention } from "./plugins/markdown/enforce-link-convention.js";
 import { inlineMathAloneOnLine } from "./plugins/markdown/inline-math-alone-on-line.js";
 import { limitDisplayMathLength } from "./plugins/markdown/limit-display-math-length.js";
@@ -10,6 +11,7 @@ import { validateLatexDelimiters } from "./plugins/markdown/validate-latex-delim
 
 export default {
   rules: {
+    "enforce-frontmatter-schema": enforceFrontmatterSchema,
     "require-frontmatter": requireFrontmatter,
     "no-h1-headers": noH1Headers,
     "require-blank-line-after-html": requireBlankLineAfterHtml,
