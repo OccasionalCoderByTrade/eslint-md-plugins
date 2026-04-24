@@ -63,10 +63,22 @@ export const enforceFrontmatterSchema: Rule.RuleModule = {
         const text = sourceCode.getText();
         const frontmatterText = extractFrontmatter(text);
 
-        if (!frontmatterText) {
+        if (frontmatterText === null) {
           context.report({
             loc: { line: 1, column: 0 },
             message: "Missing frontmatter",
+          });
+          return;
+        }
+
+        const requiredFields = Object.keys(options)
+          .map((k) => k.split("__").join("."))
+          .join(", ");
+
+        if (frontmatterText.trim() === "") {
+          context.report({
+            loc: { line: 1, column: 0 },
+            message: `Frontmatter is empty. Required fields: ${requiredFields}`,
           });
           return;
         }
@@ -77,7 +89,7 @@ export const enforceFrontmatterSchema: Rule.RuleModule = {
         } catch {
           context.report({
             loc: { line: 1, column: 0 },
-            message: "Frontmatter is invalid YAML",
+            message: `Frontmatter is invalid YAML. Required fields: ${requiredFields}`,
           });
           return;
         }

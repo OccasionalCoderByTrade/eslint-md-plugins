@@ -1,6 +1,5 @@
 ---
-title: "Example title"
-description: Examples for the enforce-frontmatter-schema rule
+title: "Example Title"
 ---
 
 ## Overview
