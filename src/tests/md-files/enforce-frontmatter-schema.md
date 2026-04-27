@@ -1,5 +1,5 @@
 ---
-title: "Example Title"
+title: "Lecture 5 (04-13/2026)"
 ---
 
 ## Overview

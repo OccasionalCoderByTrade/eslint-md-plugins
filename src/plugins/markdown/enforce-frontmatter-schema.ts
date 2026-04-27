@@ -1,6 +1,6 @@
 import type { Rule } from "eslint";
 import * as jsYaml from "js-yaml";
-import { minimatch } from "minimatch";
+import { isMatch } from "matcher";
 
 import { extractFrontmatter } from "./utils.js";
 
@@ -23,7 +23,7 @@ function matchesPattern(value: unknown, pattern: FieldPattern): boolean {
   if (pattern instanceof RegExp) {
     return pattern.test(strValue);
   }
-  return minimatch(strValue, pattern);
+  return isMatch(strValue, pattern);
 }
 
 function matchesAny(value: unknown, patterns: FieldPatterns): boolean {

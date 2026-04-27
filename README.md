@@ -14,6 +14,7 @@ Add the plugins to your ESLint configuration (`eslint.config.js` or `eslint.conf
 
 ```javascript
 import markdown from "@eslint/markdown";
+
 import {
   enforceLinkConvention,
   inlineMathAloneOnLine,
@@ -69,6 +70,17 @@ export default [
 - **inline-math-alone-on-line** - Ensure inline math equations are on their own line
 - **validate-latex-delimiters** - Validate LaTeX delimiter usage
 - **enforce-link-convention** - Enforce link naming conventions
+- **enforce-frontmatter-schema** - Enforce frontmatter field presence and value patterns
+
+  Each key in the options object is a required field path (`__` denotes nesting), and each value is a wildcard string, a `RegExp`, or an array of either. A field passes if it is present and matches at least one pattern.
+
+  ```js
+  "cannoli/enforce-frontmatter-schema": ["error", {
+    title: "Lecture *",              // wildcard string — * matches anything
+    "course__code": /^[A-Z]{4}-\d{3}$/, // regex
+    tags: ["math*", "csci*"],        // array — passes if any pattern matches
+  }]
+  ```
 
 ## License
 
