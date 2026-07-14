@@ -3,62 +3,25 @@ import type { Rule } from "eslint";
 import { FencedCodeBlockTracker, getFrontmatterEndLine } from "./utils.js";
 
 /**
- * Check if a line contains a markdown construct that requires blank line after HTML
- */
-function isProblematicMarkdownConstruct(line: string): boolean {
-  const trimmed = line.trim();
-
-  if (!trimmed) return false;
-
-  // Headings (# through ###### followed by space)
-  if (/^#{1,6}\s/.test(trimmed)) return true;
-
-  // Blockquote (> followed by space)
-  if (/^>\s/.test(trimmed)) return true;
-
-  // List (-, *, +) followed by space
-  if (/^[-*+]\s/.test(trimmed)) return true;
-
-  // Image
-  if (/^!\[/.test(trimmed)) return true;
-
-  // Link (starts with [ and has matching ])
-  if (/^\[/.test(trimmed) && /\]/.test(trimmed)) return true;
-
-  // Inline code (starts with backtick)
-  if (/^`/.test(trimmed)) return true;
-
-  // Bold/Strong (**, __)
-  if (/^\*\*/.test(trimmed) || /^__/.test(trimmed)) return true;
-
-  // Strikethrough (~~)
-  if (/^~~/.test(trimmed)) return true;
-
-  // Emphasis (*, _) - but not list markers
-  if (/^\*[^\s*]/.test(trimmed) || /^_[^\s_]/.test(trimmed)) return true;
-
-  // Table (starts with |)
-  if (/^\|/.test(trimmed)) return true;
-
-  return false;
-}
-
-/**
- * Check if a line is an HTML element/tag (but not comments or blank lines)
+ * Check if a line is an HTML element/tag or comment
  */
 function isHtmlLine(line: string): boolean {
   const trimmed = line.trim();
-  // HTML tags start with < but exclude comments
-  if (!trimmed.startsWith("<")) return false;
-  if (trimmed.startsWith("<!--")) return false; // Exclude comments
-  return true;
+  return trimmed.startsWith("<");
+}
+
+/**
+ * Check if a line is an HTML comment (e.g. an eslint rule modifier annotation)
+ */
+function isHtmlComment(line: string): boolean {
+  return line.trim().startsWith("<!--");
 }
 
 export const requireBlankLineAfterHtml: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
-      description: "Require blank line after HTML blocks when followed by markdown constructs",
+      description: "Require blank line after HTML blocks when followed by any non-HTML content",
     },
   } as const,
   create(context: Rule.RuleContext): Rule.RuleListener {
@@ -78,8 +41,16 @@ export const requireBlankLineAfterHtml: Rule.RuleModule = {
         const frontmatterEndLine = getFrontmatterEndLine(text);
         const codeBlockTracker = new FencedCodeBlockTracker(text);
 
-        // Track the last HTML line seen
-        let lastHtmlLine = -1;
+        // Line number of the most recent real HTML tag (excluding comments)
+        // that has not yet been separated from subsequent content by a blank line.
+        let lastHtmlTagLine = -1;
+        // Whether the immediately preceding non-blank line was HTML (tag or comment),
+        // used to detect adjacency across comment "annotation" lines.
+        let previousLineWasHtml = false;
+        // Whether we're in the middle of a multi-line HTML tag's attribute list
+        // (e.g. `<iframe\n  src="..."\n  ...>`), so continuation lines that don't
+        // themselves start with `<` are still treated as part of the HTML block.
+        let insideOpenTag = false;
 
         for (let i = frontmatterEndLine; i < lines.length; i++) {
           if (codeBlockTracker.isLineInFencedCodeBlock(i)) {
@@ -89,31 +60,47 @@ export const requireBlankLineAfterHtml: Rule.RuleModule = {
           const line = lines[i];
           const trimmed = line.trim();
 
-          // Update last HTML line if this is HTML
+          if (insideOpenTag) {
+            if (line.includes(">")) {
+              insideOpenTag = false;
+            }
+            previousLineWasHtml = true;
+            continue;
+          }
+
           if (isHtmlLine(line)) {
-            lastHtmlLine = i;
+            // Comments don't count as a triggering HTML line, since they're
+            // often used as annotations sitting directly above the structure
+            // they describe, but they still count as HTML so they don't get
+            // flagged themselves and don't break adjacency to a prior tag.
+            if (!isHtmlComment(line)) {
+              lastHtmlTagLine = i;
+            }
+            if (!line.includes(">")) {
+              insideOpenTag = true;
+            }
+            previousLineWasHtml = true;
             continue;
           }
 
           // If this is an empty line, reset tracking (blank line is good separator)
           if (!trimmed) {
-            lastHtmlLine = -1;
+            lastHtmlTagLine = -1;
+            previousLineWasHtml = false;
             continue;
           }
 
           // We have a non-empty, non-HTML line
-          // Check if it follows HTML without blank line
-          if (lastHtmlLine >= 0 && i === lastHtmlLine + 1) {
-            // Direct next line after HTML block
-            if (isProblematicMarkdownConstruct(line)) {
-              context.report({
-                loc: { line: i + 1, column: 0 },
-                message: "Blank line required after HTML block when followed by markdown construct",
-              });
-            }
+          // Check if it directly follows an HTML tag (possibly through comment lines)
+          if (lastHtmlTagLine >= 0 && previousLineWasHtml) {
+            context.report({
+              loc: { line: i + 1, column: 0 },
+              message: "Blank line required after HTML block when followed by non-HTML content",
+            });
           }
           // Reset tracking - we've seen non-HTML, non-blank content
-          lastHtmlLine = -1;
+          lastHtmlTagLine = -1;
+          previousLineWasHtml = false;
         }
       },
     };

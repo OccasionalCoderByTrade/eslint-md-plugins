@@ -2,23 +2,29 @@
 title: HTML Blank Line Test
 ---
 
+## Rule Info
+
+"Breathing Space" is defined as having blank line above and below the structure in question.
+
 ## ✅ VALID: HTML with blank line after
 
 <div style="color: red;">HTML content here</div>
 
 Text after HTML block (with blank line before it).
 
-## ❌ INVALID: HTML without blank line after.
+## ❌ INVALID. Reason: Closing div has no breathing space below it
 
-### Plain text text and other content immediately following HTML block are ok, but markdown constructs should be separated by a blank line from HTML elements.
+<div>Content in div</div>
+This text immediately follows the HTML block.				<!-- expect-flagged: cannoli/require-blank-line-after-html -->
+
+## ❌ INVALID. Reason: closing div has no breathing space below it
 
 <div>Content in div</div>
 > This text immediately follows (should be flagged).			<!-- expect-flagged: cannoli/require-blank-line-after-html -->
 
-## ✅ VALID: HTML comment with blank line
+## ✅ VALID: HTML comments don't need breathing space even though they count as html tags
 
 <!-- This is a comment -->
-
 Text after comment with blank line.
 
 ## Valid: Fenced code block with HTML content should not trigger the rule
@@ -26,10 +32,11 @@ Text after comment with blank line.
 ```html
 <div>
   <p>Some content here</p>
+  Hello there
 </div>
 ```
 
-## Valid: HTML closing block is followed by another HTML block, the rule should not apply
+## ✅ VALID: HTML tags can follow other HTML tags in the next line
 
 <div style="max-width: 900px; margin: 0 auto;" class="my-3">
   <iframe
@@ -41,7 +48,7 @@ Text after comment with blank line.
   ></iframe>
 </div>
 
-## Invalid. Embed image link without blank line after HTML block
+## ❌ INVALID: Embed image link without blank line after HTML block
 
 <details>
   <summary>Click to expand</summary>
@@ -49,10 +56,16 @@ Text after comment with blank line.
 
 </details>
 
-## ✅ VALID: Normal text after HTML (no blank line needed)
+## ❌ INVALID: Normal text after HTML (no blank line)
 
 <div>HTML content</div>
-This is just normal text following HTML, which doesn't require a blank line.
+This is just normal text following HTML.				<!-- expect-flagged: cannoli/require-blank-line-after-html -->
+
+## ✅ VALID: Normal text after HTML with blank line
+
+<div>HTML content</div>
+
+This is normal text following HTML, separated by a blank line.
 
 ## ❌ INVALID: Unordered list after HTML
 
@@ -109,12 +122,12 @@ _Emphasized text_ without blank line				<!-- expect-flagged: cannoli/require-bla
 
 *Emphasized text* with blank line
 
-## ❌ INVALID: HTML tag before blockquote
+## ❌ INVALID. Error: Blank line required after HTML block when followed by non-HTML content
 
 <div>Content</div>
 > **Blockquote** without blank line before HTML		<!-- expect-flagged: cannoli/require-blank-line-after-html -->
 
-## ✅ VALID: HTML tag before blockquote with blank line
+## ✅ VALID. Reason: HTML tags have breathing space.
 
 <div>Content</div>
 
@@ -156,8 +169,7 @@ Following paragraph with blank line.
 ## ❌ INVALID: Reference-style link definition after HTML
 
 <footer>Footer</footer>
-[link-ref]: https://example.com
-<!-- expect-flagged: cannoli/require-blank-line-after-html -->
+[link-ref]: https://example.com					<!-- expect-flagged: cannoli/require-blank-line-after-html -->
 
 Here is a reference to a link: [Example][link-ref].
 
@@ -210,9 +222,32 @@ Some text here.
 
 - A list with spacing
 
-## Invalid
+## ❌ INVALID: Heading immediately after HTML block
 
 <div class="note-to-self" data-is-note="true">
 ## Homework (Spring 2026)						<!-- expect-flagged: cannoli/require-blank-line-after-html -->
 
 </div>
+
+## ✅ VALID: HTML comment used as an annotation directly above a structure
+
+<!-- note: this list is intentionally short -->
+- List item annotated by a comment modifier, not flagged
+
+## ✅ VALID: HTML comment annotation above a heading
+
+<!-- some-tool: ignore -->
+### Annotated heading
+
+## ❌ INVALID: HTML tag directly followed by comment then content with no blank line
+
+<div>Content</div>
+<!-- annotation comment right after a real HTML tag -->
+This text still directly abuts the HTML block above.			<!-- expect-flagged: cannoli/require-blank-line-after-html -->
+
+## ✅ VALID: HTML tag, comment, then blank line, then content
+
+<div>Content</div>
+<!-- annotation comment -->
+
+This text is properly separated by a blank line.
